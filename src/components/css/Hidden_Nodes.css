@@ -1,0 +1,45 @@
+/* 隐藏不需要的Task节点 */
+.bpmn-icon-manual,
+.bpmn-icon-send,
+.bpmn-icon-receive,
+.bpmn-icon-business-rule,
+.bpmn-icon-service,
+.bpmn-icon-script,
+.bpmn-icon-subprocess-collapsed,
+.bpmn-icon-subprocess-expanded,
+.bpmn-icon-group,
+.bpmn-icon-task,
+.bpmn-icon-participant,
+.bpmn-icon-data-store,
+.bpmn-icon-data-object,
+.bjs-powered-by,
+.bpmn-icon-intermediate-event-none{
+	/* border:1px solid red; */
+	display:none;
+}
+/* 隐藏不需要的start节点 */
+.bpmn-icon-end-event-message,
+.bpmn-icon-end-event-escalation,
+.bpmn-icon-end-event-error,
+.bpmn-icon-end-event-compensation,
+.bpmn-icon-end-event-signal,
+.bpmn-icon-end-event-terminate,
+.bpmn-icon-loop-marker{
+	display: none;
+}
+/* 隐藏不需要的end节点 */
+.bpmn-icon-start-event-message,
+.bpmn-icon-start-event-timer,
+.bpmn-icon-start-event-condition,
+.bpmn-icon-start-event-signal{
+	display:none;
+}
+
+
+
+.bpmn-icon-intermediate-event-none{
+	display:none;
+}
+
+
+/* 节点栏改变位置 */
