@@ -47,18 +47,20 @@ export default {
     cancel() {
       this.$refs.multipleTable.clearSelection()  
     },
-
-
      onTableSelect(rows, row) {
-       console.log('--------++++-------')
-       console.log(rows)
-       console.log(row)
+        for(var i = 0; i < rows.length; i++) {
+        if(rows[i] == undefined) {
+          rows.splice(i,1);
+            i = i - 1;
+        }
+      }
         let selected = rows.length && rows.indexOf(row) !== -1
         if(selected){
-          rows.forEach(element => {
-            this.$emit('removeButton', element)
-          });
-          this.$emit('callback', rows)
+          //rows.forEach(element => {
+           // this.$emit('removeButton', element)
+          //}); 
+          //this.$emit('callback', rows)
+          this.$emit('callback', rows,row)
         }else{
           this.$emit('removeButton', row)
         }

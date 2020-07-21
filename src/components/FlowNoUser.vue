@@ -2,7 +2,7 @@
   <div>
       <!-- @selection-change="handleSelectionChange" -->
     <el-table
-      ref="multipleTable"
+      ref="multipleTableUser"
       :data="users"
       style="width: 100%"
       @select="onTableSelect"
@@ -40,30 +40,30 @@ export default {
       users
     }
   },
-  
   mounted () {
     this.$nextTick(() => {
       this.noUserData.forEach(item => {
-        this.$refs.multipleTable.toggleRowSelection(this.users.find(elem => elem.code === item.code));
+        this.$refs.multipleTableUser.toggleRowSelection(this.users.find(elem => elem.code === item.code));
       })
     })
   },
   methods: {
     cancel() {
-      this.$refs.multipleTable.clearSelection()  
+      this.$refs.multipleTableUser.clearSelection()  
     },
-
-
      onTableSelect(rows, row) {
-       console.log('--------++++-------')
-       console.log(rows)
-       console.log(row)
+        for(var i = 0; i < rows.length; i++) {
+        if(rows[i] == undefined) {
+          rows.splice(i,1);
+            i = i - 1;
+        }
+      }
         let selected = rows.length && rows.indexOf(row) !== -1
         if(selected){
-          rows.forEach(element => {
-            this.$emit('removeNoUser', element)
-          });
-          this.$emit('callback', rows)
+          // rows.forEach(element => {
+          //   this.$emit('removeNoUser', element)
+          // });
+          this.$emit('callback', rows,row)
         }else{
           this.$emit('removeNoUser', row)
         }
@@ -74,9 +74,9 @@ export default {
   },
   watch: {
     noUserData () {
-      this.$refs.multipleTable.clearSelection()
+      this.$refs.multipleTableUser.clearSelection()
       this.noUserData.forEach(item => {
-        this.$refs.multipleTable.toggleRowSelection(this.users.find(elem => elem.code === item.code));
+        this.$refs.multipleTableUser.toggleRowSelection(this.users.find(elem => elem.code === item.code));
       })
     }
   }

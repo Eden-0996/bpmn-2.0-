@@ -1,20 +1,23 @@
 <template>
   <div ref="propertyPanel" class="property-panel">
-    <el-collapse v-model="activeName" >
+    <el-collapse v-model="activeName">
       <!-- 流程名称及节点名称 -->
-      <div class="maxhead"  v-if="!rootElement">
+      <div class="maxhead" v-if="!rootElement">
         <h1 v-if="form.name !=null ">{{form.name}}</h1>
       </div>
-      <div  class="maxhead" v-if="rootElement" >
+      <div class="maxhead" v-if="rootElement">
         <h1 v-if="form.name !=null ">{{parentName}}</h1>
       </div>
       <!-- 基本属性 -->
       <el-collapse-item name="1">
         <template slot="title">
-          <span class="el_title">基本设置<i class="header-icon el-icon-info" /></span>
+          <span class="el_title">
+            基本设置
+            <i class="header-icon el-icon-info" />
+          </span>
         </template>
-          <div style="text-align: center;margin-bottom:10px"  v-if="isUserTask || isCallActivity" >
-          <el-button type="text"  @click="openFormFieldLayer()">表单属性设置</el-button>
+        <div style="text-align: center;margin-bottom:10px" v-if="isUserTask || isCallActivity">
+          <el-button type="text" @click="openFormFieldLayer()">表单属性设置</el-button>
         </div>
         <el-dialog
           title="表单设置"
@@ -77,34 +80,82 @@
         <!-- v-if="(isUserTask || )" -->
         <el-form :model="form" label-width="100px" size="small">
           <el-form-item v-if="rootElement" label="流程key">
-            <el-input v-model="form.id" clearable placeholder="请输入key" class="el_input" @input="updateKey" :disabled="true"/>
+            <el-input
+              v-model="form.id"
+              clearable
+              placeholder="请输入key"
+              class="el_input"
+              @input="updateKey"
+              :disabled="true"
+            />
           </el-form-item>
           <el-form-item v-if="!rootElement" label="节点key">
-            <el-input v-model="form.id" clearable placeholder="请输入key" class="el_input" @input="updateKey" :disabled="true"/>
+            <el-input
+              v-model="form.id"
+              clearable
+              placeholder="请输入key"
+              class="el_input"
+              @input="updateKey"
+              :disabled="true"
+            />
           </el-form-item>
           <el-form-item v-if="!rootElement" label="节点名称">
-            <el-input v-model="form.name" clearable placeholder="请输入名称" class="el_input" @input="updateName"/>
+            <el-input
+              v-model="form.name"
+              clearable
+              placeholder="请输入名称"
+              class="el_input"
+              @input="updateName"
+            />
           </el-form-item>
 
-
           <el-form-item v-if="rootElement" label="流程名称">
-            <el-input v-model="parentName" clearable placeholder="请输入名称" class="el_input"  @input="updateName"/>
+            <el-input
+              v-model="parentName"
+              clearable
+              placeholder="请输入名称"
+              class="el_input"
+              @input="updateName"
+            />
           </el-form-item>
           <div v-if="rootElement">
             <!-- 表单 -->
             <el-form-item label="表单">
-              <el-select v-model="fkey"  clearable placeholder="请选择表单" key="1" @change="updateProperties({formKey: form.formKey || undefined}, 'fkey')">
-                <el-option v-for="item in fromflow" :key="item.formKey" :label="item.formName" :value="item.formKey"></el-option>
+              <el-select
+                v-model="fkey"
+                clearable
+                placeholder="请选择表单"
+                key="1"
+                @change="updateProperties({formKey: form.formKey || undefined}, 'fkey')"
+              >
+                <el-option
+                  v-for="item in fromflow"
+                  :key="item.formKey"
+                  :label="item.formName"
+                  :value="item.formKey"
+                ></el-option>
               </el-select>
             </el-form-item>
             <!-- 工单编号 -->
             <el-form-item label="工单编号">
-              <el-input v-model="codes" @input="processCodeChange" clearable placeholder="请输入工单编号" class="el_input" />
+              <el-input
+                v-model="codes"
+                @input="processCodeChange"
+                clearable
+                placeholder="请输入工单编号"
+                class="el_input"
+              />
             </el-form-item>
             <el-form-item label="实例描述 ">
-              <el-input type="textarea"  @input="processDesChange" v-model="proDes" placeholder="请输入流程实例描述" clearable class="el_input"></el-input>
+              <el-input
+                type="textarea"
+                @input="processDesChange"
+                v-model="proDes"
+                placeholder="请输入流程实例描述"
+                clearable
+                class="el_input"
+              ></el-input>
             </el-form-item>
-
             <el-form-item label="id" hidden>
               <el-input v-model="form.orderId" clearable></el-input>
             </el-form-item>
@@ -121,21 +172,123 @@
               <el-input
                 v-model="form.description"
                 :rows="3"
-                type="textarea"
                 clearable
                 placeholder="请输入描述"
                 class="el_input"
                 @input="updateDocumentation"
               />
-            </el-form-item> -->
+            </el-form-item>-->
+          </div>
+          <!-- 定时器 -->
+          <el-form-item
+            label="提醒方式"
+            v-if="!isCallActivity && !isSequenceFlow && !rootElement && !isUserTask"
+          >
+            <el-select
+              multiple
+              clearable
+              v-model="remindMsg"
+              placeholder="请选择"
+              @change="remindMsgs"
+            >
+              <el-option
+                v-for="item in RemindMsgList"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+          <!-- UserTask -->
+          <div v-if="isUserTask">
+            <el-form-item label="待办提醒">
+              <el-select
+                multiple
+                clearable
+                v-model="remindMsg"
+                placeholder="请选择"
+                @change="remindMsgs"
+              >
+                <el-option
+                  v-for="item in RemindMsgList"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="处理类">
+              <el-input
+                v-model="disposeType"
+                @input="disposeTypes"
+                placeholder="请输入处理类"
+                clearable
+                class="el_input"
+              ></el-input>
+            </el-form-item>
+          </div>
+
+          <div v-if="!isUserTask && !isCallActivity && !isSequenceFlow && !rootElement">
+            <!-- <el-form-item label="时间类型" v-if="ifTimer === false">
+              <el-select v-model="form.timeDefinitionType" placeholder="请选择" @change="updateTime">
+                <el-option
+                  v-for="item in timeDefinitionTypeList"
+                  :key="item"
+                  :label="item"
+                  :value="item"
+                ></el-option>
+              </el-select>
+            </el-form-item>-->
+            <!--<el-form-item label="节点类型">
+               <el-select @change="changeEventType()" :value="form.eventType">
+                <el-option
+                  v-for="option in eventTypes"
+                  :key="option.value"
+                  :label="option.label"
+                  :value="option.value"
+                ></el-option>
+              </el-select>
+
+              <select @change="changeEventType" :value="form.eventType">
+                <option
+                  v-for="option in eventTypes"
+                  :key="option.value"
+                  :value="option.value"
+                >{{ option.label }}</option>
+              </select>  
+            </el-form-item>-->
+            <div>
+              <el-form-item :rules="[{ required: true, message: '超时告警不能为空'},]" 
+              label="超时告警" v-if="ifTimer === false">
+                <el-select
+                  v-model="FormalExpression.body"
+                  @change="timeoutAlarm"
+                  placeholder="请选择"
+                  clearable
+                  key="1"
+                >
+                  <el-option
+                    v-for="item in FormalExList"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+            </div>
           </div>
         </el-form>
-         <div class="el_title"  v-if="isUserTask || isCallActivity">
+        <div class="el_title" v-if="isUserTask || isCallActivity">
           <el-divider style="width:90%">按钮配置</el-divider>
-          <flow-button  style="width: 100%; margin-top: 5px;" ref="FlowButton" :buttonsList="buttonsList"
-            @callback="handleButtonCallback" @removeButton="removeButton"/>
+          <flow-button
+            style="width: 100%; margin-top: 5px;"
+            ref="FlowButton"
+            :buttonsList="buttonsList"
+            @callback="handleButtonCallback"
+            @removeButton="removeButton"
+          />
         </div>
-      </el-collapse-item> 
+      </el-collapse-item>
       <!-- 节点处理人 -->
       <el-collapse-item v-if="isUserTask">
         <template slot="title">
@@ -144,24 +297,30 @@
             <i class="header-icon el-icon-info" />
           </span>
         </template>
-        <el-form ref="userTaskForm" :model="form" label-width="100px" size="small">
-           <!-- <el-checkbox v-model="item" id="check1" @change="userCheckbox"  label="${applyUser}">发起人处理</el-checkbox> -->
-           <div style="margin:5px 40px">
-              <!-- <input type="checkbox" v-model="item" @change="userCheckbox" id="check1" value="${applyUser}" /> -->
-               <!-- <el-checkbox @change="userCheckbox">发起人处理</el-checkbox> -->
+        <el-form  ref="userTaskForm" :model="form" label-width="100px" size="small">
+          <!-- <el-checkbox v-model="item" id="check1" @change="userCheckbox"  label="${applyUser}">发起人处理</el-checkbox> -->
+          <div style="margin:5px 40px">
+            <!-- <input type="checkbox" v-model="item" @change="userCheckbox" id="check1" value="${applyUser}" /> -->
+            <!-- <el-checkbox @change="userCheckbox">发起人处理</el-checkbox> -->
 
-                <el-dropdown @command="command" trigger="click">
-                <span class="el-dropdown-link">
-                  自定义设置
-                  <i class="el-icon-arrow-down el-icon--right"></i>
-                </span>
-                <el-dropdown-menu slot="dropdown">
-                  <el-dropdown-item command="${applyUser}">发起人处理</el-dropdown-item>
-                </el-dropdown-menu>
-              </el-dropdown>
-           </div>
+            <el-dropdown @command="command" trigger="click">
+              <span class="el-dropdown-link">
+                自定义设置
+                <i class="el-icon-arrow-down el-icon--right"></i>
+              </span>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item command="${applyUser}">发起人处理</el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+          </div>
           <el-form-item label="自定义" v-if="!checkedUser == false">
-             <el-input  clearable v-model="checkedUser"  class="el_input" placeholder="请输入自定义角色"  @input="updateProperties({assignee: form.assignee || undefined})"></el-input>
+            <el-input
+              clearable
+              v-model="checkedUser"
+              class="el_input"
+              placeholder="请输入自定义角色"
+              @input="updateProperties({assignee: form.assignee || undefined})"
+            ></el-input>
           </el-form-item>
           <el-form-item label="自定义" v-else-if="!checkedUser == true">
             <el-input
@@ -188,13 +347,18 @@
             </el-select>
           </el-form-item>
         </el-form>
-        <div class="el_title">
-            <!-- <flow-no-user  style="width: 100%;" ref="FlowNoUser"  @callback="handleUserCallback" 
-            @removeNoUser="removeNoUser"   :noUserData="noUserData"/> -->
+        <div class="el_title" style="margin-bottom:50px">
+          <!-- <flow-no-user  style="width: 100%;" ref="FlowNoUser"  @callback="handleUserCallback" 
+          @removeNoUser="removeNoUser"   :noUserData="noUserData"/>-->
 
-            <flow-no-user  style="width: 100%;" ref="FlowNoUser"  @callback="handleUserCallback" 
-           :noUserData="noUserData"   @removeNoUser="removeNoUser"/>
-          </div>
+          <flow-no-user 
+            style="width: 100%;"
+            ref="FlowNoUser"
+            @callback="handleUserCallback"
+            :noUserData="noUserData"
+            @removeNoUser="removeNoUser"
+          />
+        </div>
       </el-collapse-item>
       <!-- 调用流程 -->
       <el-collapse-item v-if="isCallActivity">
@@ -247,9 +411,9 @@
             </el-table-column>
           </el-table>
         </div>
-      </el-collapse-item> -->
+      </el-collapse-item>-->
       <!-- 多实例配置 -->
-      <el-collapse-item v-if="isUserTask || isCallActivity ">
+      <el-collapse-item v-if="isUserTask || isCallActivity" hidden>
         <template slot="title">
           <span class="el_title">
             多实例配置
@@ -278,10 +442,9 @@
                 :value="item.value"
               />
             </el-select>
-          </el-form-item> -->
+          </el-form-item>-->
           <!-- v-if="selectedMultiInstance.isSequential && selectedMultiInstance.isSequential !== ''" -->
-          <div 
-          >
+          <div>
             <!-- <el-form-item label="循环基数" prop="loopCardinality">
               <el-input
                 v-model="selectedMultiInstance.loopCardinality"
@@ -290,12 +453,14 @@
                 class="el_input"
                 @input="updateFormalExpression('loopCardinality',selectedMultiInstance.loopCardinality)"
               />
-            </el-form-item> -->
-              <el-alert v-if="!element.businessObject.loopCharacteristics" class="alerty"
-                title="请选择多实例类型"
-                  type="warning"
-                  show-icon>
-            </el-alert>
+            </el-form-item>-->
+            <el-alert
+              v-if="!element.businessObject.loopCharacteristics"
+              class="alerty"
+              title="请选择多实例类型"
+              type="warning"
+              show-icon
+            ></el-alert>
             <el-form-item label="集合">
               <el-input
                 v-model="selectedMultiInstance.collection"
@@ -348,7 +513,7 @@
         </el-form>
       </el-collapse-item>
       <!-- 执行监听 -->
-      <el-collapse-item v-if="!rootElement">
+      <el-collapse-item v-if="!rootElement && !isSequenceFlow" hidden>
         <template slot="title">
           <span class="el_title">
             监听器
@@ -380,28 +545,24 @@
         </div>
       </el-collapse-item>
     </el-collapse>
-    <user-select ref="UserSelect" @callback="handleCallback" />
     <flow-listener ref="FlowListener" @callback="handleListenerCallback" />
     <flow-task-listener ref="FlowTaskListener" @callback="handleListenerCallback" />
   </div>
 </template>
-
 <script>
 import cmdHelper from "./CustomPanel/lib/helper/CmdHelper";
 import elementHelper from "./CustomPanel/lib/helper/ElementHelper";
 import extensionElementsHelper from "./CustomPanel/lib/helper/ExtensionElementsHelper";
 import ImplementationTypeHelper from "./CustomPanel/lib/helper/ImplementationTypeHelper";
-import UserSelect from "./UserSelect";
 import FlowListener from "../components/FlowListener";
 import FlowTaskListener from "../components/FlowTaskListener";
 import FlowButton from "../components/FlowButton";
-import FlowNoUser from '../components/FlowNoUser'
+import FlowNoUser from "../components/FlowNoUser";
 import { randomString } from "../utils/index";
 import urls from "../api/urls"; //url引入
 export default {
   name: "PropertyPanel",
   components: {
-    UserSelect,
     FlowListener,
     FlowTaskListener,
     FlowButton,
@@ -422,10 +583,10 @@ export default {
   },
   data() {
     return {
-    //多选框处理人
-      checkedUser:"",
-    //  流程工单
-      codes:this.code,
+      //多选框处理人
+      checkedUser: "",
+      //  流程工单
+      codes: this.code,
       fkey: this.formKey,
       proDes: this.processDes,
       dialogTableVisible: false,
@@ -458,26 +619,20 @@ export default {
       buttonsList: [],
       button: [],
       // 无需选人
-      noUserData:[],
-      noUser:[],
+      noUserData: [],
+      noUser: [],
       // 表单
       fromflow: [],
       form: {
         id: "",
         name: "",
-        proname:this.parentName,
+        proname: this.parentName,
         formKey: this.fromflow,
         versionTag: "",
-        taskPriority: "",
-        jobPriority: "",
-        candidateStarterGroups: "",
         candidateStarterUsersNames: "",
-        candidateStarterUsers: "",
-        historyTimeToLive: "",
         // 流程发起人
         initiator: "",
         description: "",
-
         assigneeType: "1",
         assigneeName: "",
         assignee: "",
@@ -486,45 +641,90 @@ export default {
         candidateGroups: "",
         // 子流程调用流程
         calledElement: "",
+        // 定时器
+        timeDefinitionType: "",
+        eventType: ""
       },
+      // 提醒方式
+      remindMsg: [],
+      disposeType: "",
+      FormalExpression: {
+        body: ""
+      },
+      eventTypes: [
+        { label: "默认", value: "" },
+        {
+          label: "MessageEventDefinition",
+          value: "bpmn:MessageEventDefinition"
+        },
+        { label: "TimerEventDefinition", value: "bpmn:TimerEventDefinition" },
+        {
+          label: "ConditionalEventDefinition",
+          value: "bpmn:ConditionalEventDefinition"
+        }
+      ],
+      FormalExList: [
+        { label: "1小时", value: "R100/PT1H" },
+        { label: "30分钟", value: "R100/PT30M" }
+      ],
+      RemindMsgList: [
+        { label: "短信", value: "sms" },
+        { label: "邮件", value: "email" },
+        { label: "微信", value: "wxsms" }
+      ],
       // 判断线-表达式
       exclusiveSequence: {
         conditionExpression: ""
       },
       excl: {},
       userTask: {},
-      fullscreenLoading: false, //保存加载
-      rolesUser: [], //处理人角色
-      proKey: [], //调用流程
+      //保存加载
+      fullscreenLoading: false,
+      //处理人角色
+      rolesUser: [],
+      //调用流程
+      proKey: [],
       // 表单属性设置
-      LayoutSettings: [], // 布局设置
-      properties:[],//只读 必填 流程变量
-      dialogVisible: false, //表单弹窗
+      // 布局设置
+      LayoutSettings: [],
+      //只读 必填 流程变量
+      properties: [],
+      //表单弹窗
+      dialogVisible: false,
       // 多实例
       multiInstanceOptions: [
-        {value: "Parallel",label: "并行多重事件"},
-        {value: "Sequential",label: "顺序多重事件"}
+        { value: "Parallel", label: "并行多重事件" },
+        { value: "Sequential", label: "顺序多重事件" }
       ],
       selectedMultiInstance: {
         isSequential: "",
         loopCardinality: "",
         collection: "",
         elementVariable: "",
-        completionCondition: '',
+        completionCondition: "",
         asyncBefore: false,
         asyncAfter: false,
         failedJobRetryTimeCycle: ""
       },
+      // 定时器
+      timeDefinitionTypeList: ["Cycle"],
+      boundaryEvent: {},
       multiInstance: {},
       multiInstanceRules: {
         loopCardinality: [
           { required: true, message: "循环基数不能为空", trigger: "blur" }
         ]
       },
-       token: "", //token
+      token: ""
     };
   },
   computed: {
+    ifTimer() {
+       if (!this.element) {
+        return;
+      }
+      return this.element.businessObject && this.element.businessObject.cancelActivity;
+    },
     isProcess() {
       if (!this.element) {
         return;
@@ -594,6 +794,14 @@ export default {
       }
       return this.verifyIsGateway(this.element.type);
     },
+    //定时器
+    isBoundaryEvent() {
+      if (!this.element) {
+        return;
+      }
+      return this.verifyIsBoundaryEvent(this.element.type);
+    },
+
     parentName: {
       get() {
         return this.value;
@@ -604,9 +812,8 @@ export default {
     }
   },
   created() {
-    
     this.init();
-     // 显示表单接口
+    // 显示表单接口
     var temps = new URLSearchParams(location.search);
     var id = temps.get("id");
     var temp = new URLSearchParams(location.search);
@@ -623,7 +830,6 @@ export default {
     this.$axios(formList)
       .then(response => {
         this.fromflow = response.data.responseBody;
-
       })
       .catch(error => {
         console.log(error);
@@ -634,7 +840,7 @@ export default {
     allList.method = "post";
     allList.url = urls + "/form/getAllRoleList";
     allList.data = {};
-     allList.headers = {
+    allList.headers = {
       token: this.token
     };
     this.$axios(allList)
@@ -663,29 +869,140 @@ export default {
       });
   },
   methods: {
+    // class处理类
+    disposeTypes(val) {
+      const { element } = this;
+      this.disposeType = val;
+      if (this.form.$type === "bpmn:UserTask") {
+        let typeCla = element.businessObject.extensionElements.values;
+        typeCla.forEach((item, index) => {
+          if (item.$type === "flowable:ExecutionListener") {
+            if(val === ''){
+              element.businessObject.extensionElements.values[index].class = 'org.kingsware.flowable.process.base.BaseNodeHandler';
+            }else{
+              element.businessObject.extensionElements.values[index].class = val;
+            }
+          }
+        });
+      }
+    },
+    remindMsgs(val) {
+      const { element } = this
+      // this.form.remindMsg = val.toString();
+      this.remindMsg = val;
+      // this.remindMsg = val.split(',');
+      if (this.form.$type === "bpmn:UserTask") {
+        let typeCla = element.businessObject.extensionElements.values;
+        typeCla.forEach((item, index) => {
+          if (item.$type === "flowable:ExecutionListener") {
+            let fields =
+              element.businessObject.extensionElements.values[index].fields;
+            fields.forEach((field, i) => {
+              if (field.name === "toDoReminder") {
+                element.businessObject.extensionElements.values[index].fields[i].string = val.toString();
+              }
+            });
+          }
+        });
+      }
+      if (this.form.$type === "bpmn:BoundaryEvent") {
+        let typeCla = element.businessObject.extensionElements.values;
+        typeCla.forEach((item, index) => {
+          if (item.$type === "flowable:ExecutionListener") {
+            let fields =
+              element.businessObject.extensionElements.values[index].fields;
+            fields.forEach((field, i) => {
+              if (field.name === "timeOutRemind") {
+                element.businessObject.extensionElements.values[index].fields[i].string = val.toString();
+              }
+            });
+          }
+        });
+      }
+    },
+    //超时告警
+    timeoutAlarm(v) {
+      this.updateTime("Cycle");
+      this.FormalExpression.body = v;
+    },
+    //时间事件定义类型修改
+    updateTime(v) {
+      // console.log(this.element);
+      if (
+        !this.element ||
+        !this.element.businessObject ||
+        !this.element.businessObject.eventDefinitions ||
+        !this.element.businessObject.eventDefinitions[0]
+      )
+        return false;
+      this.element.businessObject.eventDefinitions[0] = this.modeler._moddle.create(
+        "bpmn:TimerEventDefinition"
+      );
+      let name = `time${v}`;
+      this.FormalExpression = this.modeler._moddle.create(
+        "bpmn:FormalExpression",
+        { body: "" }
+      );
+      // if (name === "timeCycle") {
+      //   this.$set(this.FormalExpression, "endDate", "");
+      // }
+      this.element.businessObject.eventDefinitions[0][name] = this.FormalExpression;
+    },
     // 多选框处理人角色
     userCheckbox(v) {
-        if(v) {
-          this.updateProperties({assignee: '${applyUser}'})
-          this.checkedUser = '${applyUser}'
-        } else {
-          this.updateProperties({assignee: ''})
-          this.checkedUser = ''
-        }
+      if (v) {
+        this.updateProperties({ assignee: "${applyUser}" });
+        this.checkedUser = "${applyUser}";
+      } else {
+        this.updateProperties({ assignee: "" });
+        this.checkedUser = "";
+      }
     },
     // 下来菜单处理人角色
     command(command, element) {
+      console.log(this.form)
       this.form.assignee = command;
+       console.log(this.form.assignee)
       this.updateProperties({ assignee: this.form.assignee });
     },
     randomString,
+    // 监听事件
     init() {
       const that = this;
       this.modeler.on("selection.changed", e => {
+        const { element } = e;
+        this.remindMsg = []
+        this.disposeType = ''
         that.selectedElements = e.newSelection;
         that.element = e.newSelection[0];
         that.rootElement = null;
         that.setDefaultProperties(that.element);
+        
+        //判断监听器的长度 大于0个结束
+        if (this.listenerData.length > 0) return;
+        if (that.form.$type === "bpmn:UserTask") {
+          that.handleListenerCallback({
+            eventType: "start",
+            listenerType: "class",
+            value: "org.kingsware.flowable.process.base.BaseNodeHandler"
+          });
+          that.handleListenerCallback({
+            eventType: "end",
+            listenerType: "class",
+            value: "org.kingsware.flowable.process.base.BaseNodeHandler"
+          });
+
+          // if(this.element.businessObject.assignee === undefined){
+          //   this.element.businessObject.assignee = '' 
+          // }
+        }
+        if (that.form.$type === "bpmn:BoundaryEvent") {
+          that.handleListenerCallback({
+            eventType: "end",
+            listenerType: "delegateExpression",
+            value: "${timeoutReminder}"
+          });
+        }
       });
       this.modeler.on("element.changed", e => {
         const { element } = e;
@@ -710,59 +1027,114 @@ export default {
           that.setDefaultProperties(that.rootElement);
         }
       });
+      this.modeler.on("shape.changed", 0, e => {
+        const { element } = e;
+        let bo = element.businessObject
+        if(bo.loopCharacteristics && bo.loopCharacteristics.$type === 'bpmn:MultiInstanceLoopCharacteristics' ){
+          if(!bo.loopCharacteristics.collection ){
+            this.updateMultiInstanceProperty('collection','ListAssignee')
+            this.updateMultiInstanceProperty('elementVariable', 'assignee')
+              this.updateProperties({ assignee: '${assignee}' });
+          }
+          if(!bo.loopCharacteristics.completionCondition){
+            this.updateFormalExpression('completionCondition','${nrOfCompletedInstances/nrOfInstances==1}')
+          }
+        }
+      });
     },
+    // 回显
     setDefaultProperties(element) {
       if (element) {
         const { businessObject } = element;
-        console.log(businessObject)
+        // this.updateTime();
+        console.log(businessObject);
         // 按钮配置回显
-        this.buttonsList = []
+        this.buttonsList = [];
         if (businessObject.extensionElements) {
           this.buttonsList = businessObject.extensionElements.values;
           this.noUserData = businessObject.extensionElements.values;
-          console.log("--------------");
-          console.log(this.buttonsList);
         }
         // 线条表达式回显
         if (businessObject.conditionExpression) {
           this.excl[businessObject.id] = {
             conditionExpression: businessObject.conditionExpression.body
-          }
+          };
         }
         // 多实例回显
-        if(businessObject.loopCharacteristics){
+        if (businessObject.loopCharacteristics) {
           this.multiInstance[element.id] = {
             // isSequential:businessObject.loopCharacteristics.isSequential,
-            collection:businessObject.loopCharacteristics.collection,
-            elementVariable:businessObject.loopCharacteristics.elementVariable,
-            completionCondition:businessObject.loopCharacteristics.completionCondition.body
+            collection: businessObject.loopCharacteristics.collection,
+            elementVariable: businessObject.loopCharacteristics.elementVariable,
+            completionCondition:
+              businessObject.loopCharacteristics.completionCondition &&
+              businessObject.loopCharacteristics.completionCondition.body
             // loopCardinality:businessObject.loopCharacteristics.loopCardinality
-          }
+          };
         }
-         if (["bpmn:MultiInstanceLoopCharacteristics"].includes(businessObject.$type)) {
-        this.multiInstanceOptions = businessObject.conditionExpression
-          ? ""
-          : "";
-      }
+        // 定时器回显
+        if ( businessObject.eventDefinitions && businessObject.eventDefinitions[0]) {
+          let timec = ''
+            businessObject.eventDefinitions.forEach((item,index)=>{
+              // if(item.$type === 'bpmn:BoundaryEvent'){
+                 timec = item.timeCycle.body
+              // }
+          })
+          this.FormalExpression.body = timec
+        }
+        // 提醒方式
+        if (
+          businessObject.extensionElements &&
+          businessObject.extensionElements.values
+        ) {
+          let reg = "";
+          let fielVal = businessObject.extensionElements.values;
+          fielVal.forEach((e, i) => {
+            e.fields.forEach((item, index) => {
+              if (item.name == "toDoReminder") {
+                reg = item.string;
+              }
+              if(item.name == "timeOutRemind"){
+                 reg = item.string;
+              }
+            });
+          });
+          this.remindMsg = !Array.isArray(reg) && reg.split(",").filter(item => item);
+        }
+
+        this.disposeType = ''
+        if ( businessObject.extensionElements &&  element.businessObject.extensionElements.values) {
+          let fievalclass = element.businessObject.extensionElements.values
+          fievalclass.forEach((item,index)=>{
+            console.log(item)
+            if(item.$type === 'flowable:ExecutionListener') {
+               this.disposeType = item.class;
+            }
+          })
+          if(this.disposeType === 'org.kingsware.flowable.process.base.BaseNodeHandler'){
+            this.disposeType = ''
+          }
+
+          console.log(this.disposeType)
+          console.log(element.businessObject)
+          console.log( element.businessObject.extensionElements.values[0].class)
+          
+        }
+
+        if ( ["bpmn:MultiInstanceLoopCharacteristics"].includes( businessObject.$type) ) {
+          this.multiInstanceOptions = businessObject.conditionExpression ? "" : "";
+        }
         const candidateStarterUsersNames = this.form.candidateStarterUsersNames;
         this.form = {
           ...businessObject,
           ...businessObject.$attrs
+          // FormalExpression: {
+          //   body: ""
+          // }
+          // timeDefinitionType: 'Cycle'
         };
-        this.form.candidateStarterUsersNames = candidateStarterUsersNames;
-        if (element.type === "bpmn:Process") {
-          this.setProcessUser();
-        } else if (this.isUserTask) {
-          this.setUserTaskUser();
-        }
         this.setListener(element, businessObject);
         this.setTaskListener(element, businessObject);
-        // this.handleButtonCallback(element,businessObject)
-        if (businessObject.documentation) {
-          // this.form.description = businessObject.documentation[0].text
-        }
-        // this.buttonsData = this.button[element.id] || [];
-        // this.noUserData = this.noUser[element.id] || [];
         this.selectedMultiInstance = this.multiInstance[element.id] || {};
         this.exclusiveSequence = this.excl[element.id] || {};
       }
@@ -815,37 +1187,6 @@ export default {
         this.taskListener[element.id] = this.taskListenerData;
       }
     },
-    setProcessUser() {
-      let userIds = [];
-      if (this.form.candidateStarterUsers) {
-        userIds = this.form.candidateStarterUsers.split(",");
-      }
-      if (userIds.length === 0) return;
-      // 调用服务端接口
-      // userByIds({ userIds: userIds }).then(res => {
-      //   const candidateStarterUsersNames = []
-      //   const candidateStarterUsers = this.form.candidateStarterUsers
-      //   if (!candidateStarterUsers) return
-      //   for (let i = 0; i < res.length; i++) {
-      //     const user = res[i]
-      //     if (candidateStarterUsers.includes(user.id)) {
-      //       candidateStarterUsersNames.push(user.realName)
-      //     }
-      //   }
-      //   this.form.candidateStarterUsersNames = candidateStarterUsersNames.join(',')
-      // })
-    },
-    setUserTaskUser() {
-      const userIds = [];
-      if (this.userTask.assignee) {
-        userIds.push(this.userTask.assignee);
-      }
-      if (this.userTask.candidateUsers) {
-        const candidateUsers = this.userTask.candidateUsers.split(",");
-        userIds.push(candidateUsers);
-      }
-      if (userIds.length === 0) return;
-    },
     verifyIsEvent(type) {
       if (!type) return;
       return type.includes("Event");
@@ -864,6 +1205,9 @@ export default {
     verifyIsProcess(type) {
       if (!type) return;
       return type.includes("bpmn:Process");
+    },
+    verifyIsBoundaryEvent(type) {
+      return type === "bpmn:BoundaryEvent";
     },
     /**
      * 改变控件触发的事件
@@ -886,11 +1230,11 @@ export default {
     updateKey(key) {
       this.updateProperties({ id: key });
     },
+    //边界事件类型选择
     changeEventType(event) {
       const { modeler, element } = this;
       const value = event.target.value;
       const bpmnReplace = modeler.get("bpmnReplace");
-      this.eventType = value;
       bpmnReplace.replaceElement(element, {
         type: element.businessObject.$type,
         eventDefinitionType: value
@@ -914,8 +1258,9 @@ export default {
         this.element ? this.element : this.rootElement,
         properties
       );
-      if (type === 'fkey') {
-        this.$emit('update:formKey', this.fkey)
+      console.log(this.element)
+      if (type === "fkey") {
+        this.$emit("update:formKey", this.fkey);
       }
     },
     // 文档描述设置
@@ -940,15 +1285,13 @@ export default {
     },
     // 箭头类型修改
     updateConditionType(v) {
-      console.log(this.element)
-     alert(v)
+      alert(v);
       const { businessObject } = this.element;
     },
     // 条件分支设置
     updateConditionExpression() {
       if (!this.element) return;
       const { businessObject } = this.element;
-      // console.log(businessObject);
       const bpmnFactory = this.modeler.get("bpmnFactory");
       const conditionOrConditionExpression = elementHelper.createElement(
         "bpmn:FormalExpression",
@@ -966,54 +1309,13 @@ export default {
         }
       );
       this.executeCommand(command);
-      this.excl[this.element.id] = this.exclusiveSequence
+      this.excl[this.element.id] = this.exclusiveSequence;
     },
     executeCommand(command) {
       const commandStack = this.modeler.get("commandStack");
       commandStack.execute(command.cmd, command.context);
     },
-    handleChangeAssignee(value) {
-      if (value === "2") {
-        this.selectedAssignee = this.userTask.assignee;
-        this.userTask.assignee = "$INITIATOR";
-      } else {
-        this.userTask.assignee = this.selectedAssignee;
-      }
-      this.updateProperties({ assignee: this.userTask.assignee });
-    },
-    handleSelectUser(multiple, type) {
-      this.selectType = type;
-      // 这个里选人可以根据自己的系统自定义
-      const _this = this.$refs.UserSelect;
-      _this.multiple = multiple;
-      _this.dialog = true;
-    },
-    handleCallback(selectedUsers) {
-      const userIds = [];
-      const userNames = [];
-      for (let i = 0; i < selectedUsers.length; i++) {
-        userIds.push(selectedUsers[i].id);
-        userNames.push(selectedUsers[i].realName);
-      }
-      if (this.selectType === "candidateStarterUsers") {
-        this.form.candidateStarterUsers = userIds.join(",");
-        this.form.candidateStarterUsersNames = userNames.join(",");
-        this.updateProperties({
-          candidateStarterUsers: this.form.candidateStarterUsers
-        });
-      } else if (this.selectType === "assignee") {
-        this.userTask.assignee = userIds.join(",");
-        this.userTask.assigneeName = userNames.join(",");
-        this.updateProperties({ assignee: this.userTask.assignee });
-      } else if (this.selectType === "candidateUsers") {
-        this.userTask.candidateUsers = userIds.join(",");
-        this.userTask.candidateUsersName = userNames.join(",");
-        this.updateProperties({
-          candidateUsers: this.userTask.candidateUsersName
-        });
-      }
-      this.$forceUpdate();
-    },
+    // 添加监听器
     addListeners(isTaskListener) {
       this.isTaskListener = isTaskListener;
       let _this = this.$refs.FlowListener;
@@ -1022,37 +1324,13 @@ export default {
       }
       _this.dialog = true;
     },
+    // 添加监听器
     handleListenerCallback(val) {
-      console.log(val);
       const bpmnFactory = this.modeler.get("bpmnFactory");
       const element = this.rootElement ? this.rootElement : this.element;
+      if (!element) return false;
       const bo = element.businessObject;
-      let type = "";
-      let data;
-      // 执行监听器
-      if (!this.isTaskListener) {
-        type = "flowable:ExecutionListener";
-        for (let i = 0; i < this.listenerData.length; i++) {
-          data = this.listenerData[i];
-          if (data.id === val.id) {
-            this.listenerDel(data);
-            break;
-          }
-        }
-        this.listenerData.push(val);
-        this.listener[element.id] = this.listenerData;
-      } else {
-        type = "flowable:TaskListener";
-        for (let i = 0; i < this.taskListenerData.length; i++) {
-          data = this.taskListenerData[i];
-          if (data.id === val.id) {
-            this.listenerDel(data);
-            break;
-          }
-        }
-        this.taskListenerData.push(val);
-        this.taskListener[element.id] = this.taskListenerData;
-      }
+      let type = "flowable:ExecutionListener";
       let extensionElements = bo.extensionElements;
       if (!extensionElements) {
         extensionElements = elementHelper.createElement(
@@ -1067,15 +1345,56 @@ export default {
           })
         );
       }
-      this.executeCommand(
-        this.createExtensionElement(
-          element,
-          type,
-          extensionElements,
-          val,
-          bpmnFactory
-        )
-      );
+      if (bo.$type === "bpmn:UserTask") {
+        this.executeCommand(
+          this.createExtensionElement( element, type, extensionElements, val, bpmnFactory)
+        );
+        extensionElements.values.forEach((e, i) => {
+          let fields = [];
+          if (e.event === "start") {
+            let field = this.modeler._moddle.create("flowable:Field", {
+              string:
+                Array.isArray(this.remindMsg) && this.remindMsg.toString(),
+              name: "toDoReminder"
+            });
+            let eventNameField = this.modeler._moddle.create("flowable:Field", {
+              string: "start",
+              name: "eventName"
+            });
+            fields[0] = eventNameField;
+            fields[1] = field;
+          } else if (e.event === "end") {
+            let eventNameField = this.modeler._moddle.create("flowable:Field", {
+              string: "end",
+              name: "eventName"
+            });
+            fields[0] = eventNameField;
+          }
+
+          extensionElements.values[i].fields = fields;
+
+        });
+      }
+      if (bo.$type === "bpmn:BoundaryEvent") {
+        this.executeCommand(
+          this.createExtensionElement(
+            element,
+            type,
+            extensionElements,
+            val,
+            bpmnFactory
+          )
+        );
+        extensionElements.values.forEach((e, i) => {
+          let field = this.modeler._moddle.create("flowable:Field", {
+            string: Array.isArray(this.remindMsg) && this.remindMsg.toString(),
+            name: "timeOutRemind"
+          });
+          let fields = [];
+          fields[0] = field;
+          extensionElements.values[i].fields = fields;
+        });
+      }
     },
     // 创建扩展元素
     createExtensionElement(
@@ -1095,7 +1414,6 @@ export default {
         extensionElements,
         bpmnFactory
       );
-
       return cmdHelper.addElementsTolist(element, extensionElements, "values", [
         newElem
       ]);
@@ -1149,7 +1467,7 @@ export default {
       });
     },
     // 无需选人
-    addNoUser(){
+    addNoUser() {
       const _this = this.$refs.FlowNoUser;
       _this.multipleSelection = this.noUserData;
       this.noUserData.forEach(row => {
@@ -1158,7 +1476,7 @@ export default {
       _this.dialog = true;
     },
     // 无需选人
-    handleUserCallback(datas){
+    handleUserCallback(datas, row) {
       this.noUserData = datas;
       const bpmnFactory = this.modeler.get("bpmnFactory");
       const element = this.rootElement ? this.rootElement : this.element;
@@ -1178,20 +1496,17 @@ export default {
         );
       }
       const newElems = [];
-      for (let i = 0; i < this.noUserData.length; i++) {
-        const button = this.noUserData[i];
-        const props = {
-          name: button.name,
-          code: button.code
-        };
-        const newElem = elementHelper.createElement(
-          "flowable:Button",
-          props,
-          extensionElements,
-          bpmnFactory
-        );
-        newElems.push(newElem);
-      }
+      const props = {
+        name: row.name,
+        code: row.code
+      };
+      const newElem = elementHelper.createElement(
+        "flowable:Button",
+        props,
+        extensionElements,
+        bpmnFactory
+      );
+      newElems.push(newElem);
       this.executeCommand(
         cmdHelper.addElementsTolist(
           element,
@@ -1202,28 +1517,49 @@ export default {
       );
     },
     //删除无需选人
-    removeNoUser(data){
-      console.log(data)
-      // const idx = this.noUserData.indexOf(data);
-       const idx = this.noUserData.findIndex(item => item.code === data.code);
+    removeNoUser(data) {
       const type = "flowable:Button";
-      this.noUserData.splice(idx, 1);
       const element = this.rootElement ? this.rootElement : this.element;
       const bo = element.businessObject;
-      this.executeCommand(this.removeExtensionElement(element, bo, type, idx));
+      const va = bo.extensionElements.values;
+      for (var i = 0; i < va.length; i++) {
+        if (va[i].code == undefined) {
+          va.splice(i, 1);
+          i = i - 1;
+        }
+      }
+      let idx = 0;
+      va.forEach((e, i) => {
+        if (e.code === data.code) {
+          this.executeCommand(
+            this.removeExtensionElement(element, bo, type, i)
+          );
+        }
+      });
     },
     // 删除按钮配置
     removeButton(data) {
-      console.log(data)
-      const idx = this.buttonsList.findIndex(item => item.code === data.code);
       const type = "flowable:Button";
-      this.buttonsList.splice(idx, 1);
       const element = this.rootElement ? this.rootElement : this.element;
       const bo = element.businessObject;
-      this.executeCommand(this.removeExtensionElement(element, bo, type, idx));
+      const va = bo.extensionElements.values;
+      let idx = 0;
+      for (var i = 0; i < va.length; i++) {
+        if (va[i].code == undefined) {
+          va.splice(i, 1);
+          i = i - 1;
+        }
+      }
+      va.forEach((e, i) => {
+        if (e.code === data.code) {
+          this.executeCommand(
+            this.removeExtensionElement(element, bo, type, i)
+          );
+        }
+      });
     },
     // 按钮实例
-    handleButtonCallback(datas) {
+    handleButtonCallback(datas, row) {
       this.buttonsList = datas;
       const bpmnFactory = this.modeler.get("bpmnFactory");
       const element = this.rootElement ? this.rootElement : this.element;
@@ -1243,20 +1579,17 @@ export default {
         );
       }
       const newElems = [];
-      for (let i = 0; i < this.buttonsList.length; i++) {
-        const button = this.buttonsList[i];
-        const props = {
-          name: button.name,
-          code: button.code
-        };
-        const newElem = elementHelper.createElement(
-          "flowable:Button",
-          props,
-          extensionElements,
-          bpmnFactory
-        );
-        newElems.push(newElem);
-      }
+      const props = {
+        name: row.name,
+        code: row.code
+      };
+      const newElem = elementHelper.createElement(
+        "flowable:Button",
+        props,
+        extensionElements,
+        bpmnFactory
+      );
+      newElems.push(newElem);
       this.executeCommand(
         cmdHelper.addElementsTolist(
           element,
@@ -1268,12 +1601,8 @@ export default {
     },
     // 添加多实例
     handleMultiInstance(val) {
-      const { businessObject } = this.element
+      const { businessObject } = this.element;
       this.multiInstance[this.element.id] = this.selectedMultiInstance;
-      console.log(businessObject)
-
-
-   
       let loopCharacteristics;
       if (val === "") {
         loopCharacteristics = undefined;
@@ -1290,13 +1619,12 @@ export default {
         loopCharacteristics: loopCharacteristics
       });
     },
+    // 多实例 集合 元素变量
     updateFormalExpression(propertyName, newValue) {
       const bpmnFactory = this.modeler.get("bpmnFactory");
       const bo = this.element.businessObject;
       const loopCharacteristics = bo.loopCharacteristics;
-
       const expressionProps = {};
-
       if (!newValue) {
         // remove formal expression
         expressionProps[propertyName] = undefined;
@@ -1309,7 +1637,6 @@ export default {
         );
         return;
       }
-
       const existingExpression = loopCharacteristics.get(propertyName);
       if (!existingExpression) {
         expressionProps[propertyName] = elementHelper.createElement(
@@ -1333,18 +1660,9 @@ export default {
         })
       );
     },
+     // 多实例 完成条件
     updateMultiInstanceProperty(type, value) {
-      
       const bo = this.element.businessObject;
-          if(!bo.loopCharacteristics){
-            this.$message({
-              message: "请选择多实例类型",
-              type: "warning"
-            });
-            return;
-      }
-      // console.log(this.element.businessObject)
-      // console.log(this.element.businessObject.loopCharacteristics.collection)
       const loopCharacteristics = bo.loopCharacteristics;
       const pros = {};
       pros[type] = value || undefined;
@@ -1354,8 +1672,6 @@ export default {
     },
     // 表单设置 // 打开表单属性设置弹层
     openFormFieldLayer() {
-      console.log(this.formKey)
-      console.log(this.form.id)
       if (!this.formKey) {
         this.$message({
           message: "请先选择表单",
@@ -1365,7 +1681,6 @@ export default {
       }
       var temp = new URLSearchParams(location.search);
       this.token = temp.get("token");
-      // alert(this.token)
       let params = {};
       params.method = "post";
       params.url = urls + "/process/rest/config/query/list";
@@ -1414,7 +1729,6 @@ export default {
     },
     // 勾选/取消勾选复选框
     changeCheckbox(item) {
-      console.log(item)
       // 只读
       if (item.column.property === "readonly") {
         if (this.properties[item.$index].readonly !== "true") {
@@ -1481,7 +1795,7 @@ export default {
               message: "保存成功",
               type: "success"
             });
-            this.closedDialog()
+            this.closedDialog();
           } else {
             this.$message.error("保存失败");
           }
@@ -1492,26 +1806,25 @@ export default {
       this.dialogVisible = false;
     },
     // 取消
-    cancelForm(){
+    cancelForm() {
       this.closedDialog();
     },
     // 清空表单设置内容
     closedDialog() {
       this.properties = [];
       this.LayoutSettings = [];
-       this.dialogVisible = false;
+      this.dialogVisible = false;
     },
     // 双向v绑定
-    processDesChange (val) {
-      this.$emit('update:processDes', val)
+    processDesChange(val) {
+      this.$emit("update:processDes", val);
     },
-    processCodeChange(val){
-       this.$emit('update:code', val)
+    processCodeChange(val) {
+      this.$emit("update:code", val);
     }
   }
 };
 </script>
-
 <style lang="scss">
 .el-main {
   /*背景网格*/
@@ -1529,21 +1842,20 @@ export default {
 }
 .el_title {
   padding-left: 20px;
-   padding-right: 20px;
+  padding-right: 20px;
 }
 .property-panel .el_input,
 .property-panel .el-select {
   width: 88%;
-}，
-.alerty{
-  width:96%;
+}
+.alerty {
+  width: 96%;
   margin: 10px auto;
 }
-
-.maxhead{
-   height:50px;
-    line-height:50px;
-   text-align: center;
+.maxhead {
+  height: 50px;
+  line-height: 50px;
+  text-align: center;
 }
 .el-dropdown-link {
   cursor: pointer;
@@ -1552,4 +1864,5 @@ export default {
 .el-icon-arrow-down {
   font-size: 12px;
 }
+
 </style>

@@ -49,8 +49,9 @@ export default {
       ],
       listenerTypes: [
         { value: 'class', label: '类' },
-        // { value: 'expression', label: '表达式' },
-        // { value: 'delegateExpression', label: '代理表达式' }
+        { value: 'expression', label: '表达式' },
+        { value: 'delegateExpression', label: '代理表达式' }
+        // ${timeoutReminder}
       ],
       form: {
         id: '',

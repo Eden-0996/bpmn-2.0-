@@ -12,9 +12,7 @@
 .bpmn-icon-participant,
 .bpmn-icon-data-store,
 .bpmn-icon-data-object,
-.bjs-powered-by,
-.bpmn-icon-intermediate-event-none{
-	/* border:1px solid red; */
+.bjs-powered-by{
 	display:none;
 }
 /* 隐藏不需要的start节点 */
@@ -29,17 +27,23 @@
 }
 /* 隐藏不需要的end节点 */
 .bpmn-icon-start-event-message,
-.bpmn-icon-start-event-timer,
 .bpmn-icon-start-event-condition,
 .bpmn-icon-start-event-signal{
 	display:none;
 }
-
-
-
-.bpmn-icon-intermediate-event-none{
-	display:none;
+/* 中间事件 设置小按钮内容隐藏 */
+.bpmn-icon-intermediate-event-none,
+.bpmn-icon-intermediate-event-catch-message,
+.bpmn-icon-intermediate-event-catch-timer,
+.bpmn-icon-intermediate-event-catch-escalation,
+.bpmn-icon-intermediate-event-catch-condition,
+.bpmn-icon-intermediate-event-catch-error,
+.bpmn-icon-intermediate-event-catch-cancel,
+.bpmn-icon-intermediate-event-catch-signal,
+.bpmn-icon-intermediate-event-catch-compensation,
+.bpmn-icon-intermediate-event-catch-non-interrupting-message,
+.bpmn-icon-intermediate-event-catch-non-interrupting-escalation,
+.bpmn-icon-intermediate-event-catch-non-interrupting-condition,
+.bpmn-icon-intermediate-event-catch-non-interrupting-signal{
+	display: none;
 }
-
-
-/* 节点栏改变位置 */

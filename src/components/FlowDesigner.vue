@@ -304,7 +304,7 @@ export default {
       });
     },
     handleOpen() {
-      if (this.bpmnModeler) return;
+      if (this.bpmnModeler) return    
       this.bpmnModeler = new Modeler({
         container: "#canvas",
         additionalModules: [

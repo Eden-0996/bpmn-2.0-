@@ -411,6 +411,11 @@
           "type": "String"
         },
         {
+          "name": "nouser",
+          "isAttr": true,
+          "type": "String"
+        },
+        {
           "name": "candidateUsers",
           "isAttr": true,
           "type": "String"
@@ -637,7 +642,14 @@
           "name": "values",
           "type": "Property",
           "isMany": true
+        },
+        {
+          "name": "nouser",
+          "type": "Property",
+          "isMany": true
         }
+
+        
       ]
     },
     {
@@ -1050,6 +1062,67 @@
         }
       ]
     },
+
+
+
+    {
+      "name": "NoUser",
+      "superClass": [ "Element" ],
+      "meta": {
+        "allowedIn": [
+          "bpmn:UserTask"
+        ]
+      },
+      "properties": [
+        {
+          "name": "id",
+          "type": "String",
+          "isAttr": true
+        },
+        {
+          "name": "name",
+          "type": "String",
+          "isAttr": true
+        },
+        {
+          "name": "code",
+          "type": "String",
+          "isAttr": true
+        },
+
+        {
+          "name": "formKey",
+          "type": "String",
+          "isAttr": true
+        },
+        {
+          "name": "checkedAlls",
+          "type": "String",
+          "isAttr": true
+        },
+        {
+          "name": "isHide",
+          "type": "String",
+          "isAttr": true
+        },
+        {
+          "name": "next",
+          "type": "String",
+          "isAttr": true
+        },
+        {
+          "name": "sort",
+          "type": "String",
+          "isAttr": true
+        }
+      ]
+    },
+
+
+
+
+
+
     {
       "name": "FormProperty",
       "superClass": [ "Element" ],
@@ -1113,6 +1186,11 @@
         {
           "name": "values",
           "type": "Value",
+          "isMany": true
+        },
+        {
+          "name": "nouser",
+          "type": "Nouser",
           "isMany": true
         }
       ]
@@ -1179,6 +1257,11 @@
         {
           "name": "values",
           "type": "Value",
+          "isMany": true
+        },
+        {
+          "name": "nouser",
+          "type": "Nouser",
           "isMany": true
         }
       ]
